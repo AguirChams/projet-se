@@ -1,24 +1,37 @@
+#!/bin/bash
 
+echo "=== MISE À JOUR DU SYSTÈME ==="
+sudo apt update && sudo apt upgrade -y
 
+echo "=== INSTALLATION D'OUTILS DE BASE ==="
+sudo apt install -y curl wget unzip htop git net-tools
 
-#les commandes a entrer
+echo "=== INSTALLATION D'OPENSSH SERVER ==="
+sudo apt install -y openssh-server
+sudo systemctl enable ssh
+sudo systemctl start ssh
 
- docker-compose up -d
- docker ps
- docker exec -it mariadb bash
+echo "=== INSTALLATION DE DOCKER ==="
+sudo apt install -y docker.io
+sudo systemctl start docker
+sudo systemctl enable docker
 
- # creation bd
-  mariadb -u user -p 
-  userpass
-  USE projetdb
-  CREATE TABLE users ( 
-id INT AUTO_INCREMENT PRIMARY KEY,
-nom VARCHAR(100)
-);
-INSERT INTO users (nom)
- VALUES ('CHAMS'), ('YAHYA'), ('YASSINE'), ('ABDELLAH
-'), ('ASMAE');
+echo "=== INSTALLATION DE DOCKER COMPOSE ==="
+sudo apt install -y docker-compose
 
-# monitoring des containers
- docker stats
- docker top mariadb
+echo "=== CRÉATION DE L'UTILISATEUR dockeruser ==="
+if id "dockeruser" &>/dev/null; then
+    echo "Utilisateur dockeruser existe déjà"
+else
+    sudo useradd -m -s /bin/bash dockeruser
+    echo "dockeruser:dockeruser" | sudo chpasswd
+    sudo usermod -aG docker dockeruser
+    echo "Utilisateur dockeruser créé avec mot de passe dockeruser"
+fi
+
+echo "=== VÉRIFICATIONS ==="
+docker --version
+docker-compose --version
+id dockeruser
+
+echo "=== INSTALLATION TERMINÉE ==="
